@@ -1,4 +1,6 @@
 from collections import deque
+import networkx as nx
+import matplotlib.pyplot as plt
 from functools import reduce
 
 class Grafo(object):
@@ -7,6 +9,24 @@ class Grafo(object):
 
     def __str__(self):
         return str(self.relaciones)
+
+    def dibujar_grafo(self):
+        # Crear un objeto de grafo de NetworkX
+        G = nx.Graph()
+        
+        # Añadir nodos y aristas
+        for vertice, adyacentes in self.relaciones.items():  # Cambié self.grafo a self.relaciones
+            for adyacente in adyacentes:
+                G.add_edge(vertice, adyacente['elemento'])  # Agregar la relación con el 'elemento'
+        
+        # Dibujar el grafo
+        plt.figure(figsize=(12, 12))
+        pos = nx.spring_layout(G, seed=42)  # Layout para mejorar visualización
+        nx.draw(G, pos, with_labels=True, node_color='skyblue', edge_color='gray', 
+                node_size=700, font_size=10, font_weight='bold')
+        
+        plt.title("Visualización del Grafo")
+        plt.show()
 
 def agregar(grafo, elemento):
     grafo.relaciones[elemento] = []
@@ -75,4 +95,3 @@ def anterior(etiqueta):
 def menorValorNoProcesado(etiquetas, procesados):
     etiquetadosSinProcesar = filter(lambda nodo_acum: nodo_acum[0] not in procesados, etiquetas.items())
     return min(etiquetadosSinProcesar, key=lambda nodo_acum: nodo_acum[1][0])[0]
-
