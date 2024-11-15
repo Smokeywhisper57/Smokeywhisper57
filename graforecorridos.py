@@ -1,7 +1,9 @@
 from collections import deque
+from functools import reduce
 import networkx as nx
 import matplotlib.pyplot as plt
 from functools import reduce
+
 
 class Grafo(object):
     def __init__(self):
@@ -10,23 +12,33 @@ class Grafo(object):
     def __str__(self):
         return str(self.relaciones)
 
+
     def dibujar_grafo(self):
-        # Crear un objeto de grafo de NetworkX
-        G = nx.Graph()
+        # Crear un objeto de grafo dirigido de NetworkX
+        G = nx.DiGraph()
         
-        # Añadir nodos y aristas
-        for vertice, adyacentes in self.relaciones.items():  # Cambié self.grafo a self.relaciones
+        # Añadir nodos y aristas con pesos
+        for vertice, adyacentes in self.relaciones.items():
             for adyacente in adyacentes:
-                G.add_edge(vertice, adyacente['elemento'])  # Agregar la relación con el 'elemento'
+                G.add_edge(vertice, adyacente['elemento'], weight=adyacente['peso'])
         
         # Dibujar el grafo
         plt.figure(figsize=(12, 12))
         pos = nx.spring_layout(G, seed=42)  # Layout para mejorar visualización
-        nx.draw(G, pos, with_labels=True, node_color='skyblue', edge_color='gray', 
-                node_size=700, font_size=10, font_weight='bold')
         
-        plt.title("Visualización del Grafo")
+        # Dibujar nodos y aristas
+        nx.draw(G, pos, with_labels=True, node_color='skyblue', edge_color='gray',
+                node_size=700, font_size=10, font_weight='bold', arrows=True, connectionstyle='arc3,rad=0.1')
+        
+        # Obtener pesos de las aristas
+        edge_labels = nx.get_edge_attributes(G, 'weight')
+        
+        # Dibujar etiquetas de los pesos
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=edge_labels, font_color='red', font_size=9)
+        
+        plt.title("Visualización del Grafo Dirigido con Pesos")
         plt.show()
+
 
 def agregar(grafo, elemento):
     grafo.relaciones[elemento] = []
@@ -95,3 +107,4 @@ def anterior(etiqueta):
 def menorValorNoProcesado(etiquetas, procesados):
     etiquetadosSinProcesar = filter(lambda nodo_acum: nodo_acum[0] not in procesados, etiquetas.items())
     return min(etiquetadosSinProcesar, key=lambda nodo_acum: nodo_acum[1][0])[0]
+
